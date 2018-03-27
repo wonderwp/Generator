@@ -1,0 +1,22 @@
+{
+    "name": "wonderwp/generator-wwp",
+    "description": "WonderWP Plugin Generator",
+    "type": "wordpress-muplugin",
+    "authors": [
+        {
+            "name": "Jeremy Desvaux",
+            "email": "jeremy.desvaux@wonderful.fr"
+        }
+    ],
+    "require": {
+        "php": "~5.6|~7",
+        "wp-cli/wp-cli": "^1.3"
+    },
+    "autoload": {
+        "psr-4": {"WonderWp\\Plugin\\Generator\\": ""},
+        "exclude-from-classmap": [
+            "/tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}
