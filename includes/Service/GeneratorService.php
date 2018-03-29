@@ -75,7 +75,7 @@ class GeneratorService
 
     protected function checkDatas()
     {
-        $requiredDatas = ['name', 'desc', 'namespace'];
+        $requiredDatas = ['name', 'namespace'];
         $errors        = [];
         foreach ($requiredDatas as $req) {
             if (empty($this->data[$req])) {
@@ -89,6 +89,9 @@ class GeneratorService
 
     protected function prepareDatas()
     {
+        if (empty($this->data['classprefix'])) {
+            $this->data['classprefix'] = @end(explode('\\', $this->data['namespace']));
+        }
         $this->data['className'] = $this->data['classprefix'];
 
         return $this;
@@ -134,7 +137,41 @@ class GeneratorService
      */
     protected function generateBootstrapFile()
     {
-        $this->importDeliverable('__PLUGIN_SLUG__.php');
+        $pluginMetas = [];
+
+        $pluginMetas['Plugin Name'] = $this->data['name'];
+        if (!empty($this->data['uri'])) {
+            $pluginMetas['Plugin URI'] = $this->data['uri'];
+        }
+        if (!empty($this->data['desc'])) {
+            $pluginMetas['Description'] = $this->data['desc'];
+        }
+        $pluginMetas['Version'] = !empty($this->data['plugin_version']) ? $this->data['plugin_version'] : '0.0.1';
+        if (!empty($this->data['author'])) {
+            $pluginMetas['Author'] = $this->data['author'];
+        }
+        if (!empty($this->data['author_uri'])) {
+            $pluginMetas['Author URI'] = $this->data['author_uri'];
+        }
+        if (!empty($this->data['licence'])) {
+            $pluginMetas['License'] = $this->data['licence'];
+        }
+        if (!empty($this->data['licence_uri'])) {
+            $pluginMetas['License URI'] = $this->data['licence_uri'];
+        }
+        if (!empty($this->data['textdomain'])) {
+            $pluginMetas['Text Domain'] = $this->data['textdomain'];
+        }
+        $pluginMetas['Domain Path'] = !empty($this->data['domain_path']) ? $this->data['domain_path'] : '/languages';
+
+        $pluginMetasString = '';
+        foreach ($pluginMetas as $key => $val) {
+            $pluginMetasString .= "\n" . ' * ' . $key . ' : ' . $val;
+        }
+
+        $this->importDeliverable('__PLUGIN_SLUG__.php', [
+            '__PLUGIN_METAS__' => $pluginMetasString,
+        ]);
 
         return $this;
     }
