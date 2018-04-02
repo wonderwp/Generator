@@ -16,7 +16,7 @@
         "wonderwp/task": "dev-develop@dev"
     },
     "autoload": {
-        "psr-4": {"WonderWp\\Plugin\\Generator\\": ""},
+        "psr-4": {"WonderWp\\Plugin\\Generator\\": "includes"},
         "exclude-from-classmap": [
             "/tests/"
         ]
