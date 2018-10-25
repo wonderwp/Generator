@@ -2,7 +2,7 @@
 
 namespace __PLUGIN_NS__\ListTable;
 
-use WonderWp\Plugin\Core\Framework\PluginSkeleton\DoctrineListTable;
+use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
 
 class __PLUGIN_ENTITY__ListTable extends DoctrineListTable
 {

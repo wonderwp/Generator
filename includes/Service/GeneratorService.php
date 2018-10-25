@@ -40,16 +40,24 @@ class GeneratorService
         return $this;
     }
 
-    public function generate()
+    /** Constructor */
+    public function __construct()
     {
         $this->container  = Container::getInstance();
         $this->fileSystem = $this->container['wwp.fileSystem'];
         $this->manager    = $this->container['wonderwp_generator.Manager'];
+    }
+
+
+    public function generate()
+    {
 
         $check = $this->checkDatas();
         if ($check->getCode() === 200) {
             $msg = "Starting Generation of the " . $this->data['name'] . " plugin.";
-            \WP_CLI::line($msg);
+            if(class_exists('WP_CLI')) {
+                \WP_CLI::line($msg);
+            }
 
             try {
                 $this
@@ -64,12 +72,18 @@ class GeneratorService
                     ->generateAdminController()//✓
                 ;
             } catch (\Exception $e) {
-                \WP_CLI::error($e->getMessage(), true);
+                if(class_exists('WP_CLI')) {
+                    \WP_CLI::error($e->getMessage(), true);
+                }
             }
 
-            \WP_CLI::success('Plugin generation finished');
+            if(class_exists('WP_CLI')) {
+                \WP_CLI::success('Plugin generation finished');
+            }
         } else {
-            \WP_CLI::error(implode("\n", $check->getData('errors')), true);
+            if(class_exists('WP_CLI')) {
+                \WP_CLI::error(implode("\n", $check->getData('errors')), true);
+            }
         }
     }
 
@@ -159,14 +173,13 @@ class GeneratorService
         if (!empty($this->data['licence_uri'])) {
             $pluginMetas['License URI'] = $this->data['licence_uri'];
         }
-        if (!empty($this->data['textdomain'])) {
-            $pluginMetas['Text Domain'] = $this->data['textdomain'];
-        }
+
+        $pluginMetas['Text Domain'] = !empty($this->data['textdomain']) ? $this->data['textdomain'] : strtolower($this->data['className']);
         $pluginMetas['Domain Path'] = !empty($this->data['domain_path']) ? $this->data['domain_path'] : '/languages';
 
         $pluginMetasString = '';
         foreach ($pluginMetas as $key => $val) {
-            $pluginMetasString .= "\n" . ' * ' . $key . ' : ' . $val;
+            $pluginMetasString .= "\n" . ' * ' . $key . ': ' . $val;
         }
 
         $this->importDeliverable('__PLUGIN_SLUG__.php', [
@@ -211,7 +224,7 @@ EOD
     {
         $replacements = [
             '//__PLUGIN_ACTIVATION_TASKS__//' => <<<'EOD'
-        $this->copyLanguageFiles(dirname(__DIR__) . '/languages');
+        $this->copyLanguageFiles(dirname(dirname(__DIR__)) . '/languages');
 EOD
             ,
         ];
@@ -307,7 +320,7 @@ EOD;
         $replacements = array_merge([
             '__PLUGIN_NAME__'       => $this->data['name'],
             '__PLUGIN_SLUG__'       => sanitize_title($this->data['name']),
-            '__PLUGIN_DESC__'       => $this->data['desc'],
+            '__PLUGIN_DESC__'       => !empty($this->data['desc']) ? $this->data['desc'] : '',
             '__PLUGIN_CONST__'      => strtoupper($this->data['classprefix']),
             '__PLUGIN_CONST_LOW__'  => strtolower($this->data['classprefix']),
             '__PLUGIN_ENTITY__'     => $this->data['classprefix'],
