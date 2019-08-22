@@ -32,32 +32,6 @@ if (!defined('WWP_PLUGIN_GENERATOR_MANAGER')) {
 }
 
 /**
- * Register activation hook
- * The code that runs during plugin activation.
- * This action is documented in includes/ErActivator.php
- */
-register_activation_hook(__FILE__, function () {
-    $activator = Container::getInstance()->offsetGet(WWP_PLUGIN_GENERATOR_NAME . '.Manager')->getService(ServiceInterface::ACTIVATOR_NAME);
-
-    if ($activator instanceof ActivatorInterface) {
-        $activator->activate();
-    }
-});
-
-/**
- * Register deactivation hook
- * The code that runs during plugin deactivation.
- * This action is documented in includes/MembreDeactivator.php
- */
-register_deactivation_hook(__FILE__, function () {
-    $deactivator = Container::getInstance()->offsetExists(WWP_PLUGIN_GENERATOR_NAME . '.Manager') ? Container::getInstance()->offsetGet(WWP_PLUGIN_GENERATOR_NAME . '.Manager')->getService(ServiceInterface::DEACTIVATOR_NAME) : null;
-
-    if ($deactivator instanceof DeactivatorInterface) {
-        $deactivator->deactivate();
-    }
-});
-
-/**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  * This class is called the manager
