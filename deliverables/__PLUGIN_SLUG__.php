@@ -49,13 +49,13 @@ register_activation_hook(__FILE__, function () {
  * The code that runs during plugin deactivation.
  * This action is documented in includes/MembreDeactivator.php
  */
-register_deactivation_hook(__FILE__, function () {
+/*register_deactivation_hook(__FILE__, function () {
     $deactivator = Container::getInstance()->offsetExists(WWP_PLUGIN___PLUGIN_CONST___NAME . '.Manager') ? Container::getInstance()->offsetGet(WWP_PLUGIN___PLUGIN_CONST___NAME . '.Manager')->getService(ServiceInterface::DEACTIVATOR_NAME) : null;
 
     if ($deactivator instanceof DeactivatorInterface) {
         $deactivator->deactivate();
     }
-});
+});*/
 
 /**
  * The core plugin class that is used to define internationalization,
