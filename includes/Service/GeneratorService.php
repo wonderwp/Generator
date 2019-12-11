@@ -111,9 +111,9 @@ class GeneratorService
         return $this;
     }
 
-    protected function createBaseFolders()
+    protected function createBaseFolders(array $folders = [])
     {
-        $this->folders                = [];
+        $this->folders                = $folders;
         $this->folders['base']        = WP_PLUGIN_DIR . '/' . sanitize_title($this->data['name']);
         $this->folders['includes']    = $this->folders['base'] . '/includes';
         $this->folders['services']    = $this->folders['includes'] . '/Service';
@@ -208,7 +208,7 @@ class GeneratorService
             //  Activator service
             return new __PLUGIN_ENTITY__Activator($this);
         });
-        
+
 EOD
         );
 
