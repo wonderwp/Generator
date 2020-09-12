@@ -46,10 +46,10 @@ class __PLUGIN_ENTITY__Manager extends __PLUGIN_PARENT_MANAGER__
         */
 
         // Register Services
-        $this->addService(ServiceInterface::HOOK_SERVICE_NAME, $container->factory(function () {
+        $this->addService(ServiceInterface::HOOK_SERVICE_NAME, function () {
             // Hook service
             return new __PLUGIN_ENTITY__HookService();
-        }));//__PLUGIN_ENTITY_SERVICES__//
+        });//__PLUGIN_ENTITY_SERVICES__//
 
         /* Uncomment this if your plugin has assets, then create the __PLUGIN_ENTITY__AssetService class in the include folder
         $this->addService(ServiceInterface::ASSETS_SERVICE_NAME, function () {
