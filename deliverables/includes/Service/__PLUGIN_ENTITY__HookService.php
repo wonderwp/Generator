@@ -15,7 +15,7 @@ class __PLUGIN_ENTITY__HookService extends AbstractHookService
      * Run
      * @return $this
      */
-    public function run()
+    public function register()
     {
         // Get Manager
         $container     = Container::getInstance();
