@@ -10,7 +10,7 @@ class GeneratorCommandService implements TaskServiceInterface
     const COMMAND_NAME = 'generate-plugin';
 
     /** @inheritdoc */
-    public function registerCommands()
+    public function register()
     {
         if (!class_exists('WP_CLI')) {
             return;
