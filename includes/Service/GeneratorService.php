@@ -123,7 +123,7 @@ class GeneratorService
 
         foreach ($this->folders as $folder) {
             if (!is_dir($folder)) {
-                if (!$this->fileSystem->mkdir($folder, FS_CHMOD_DIR, true)) {
+                if (!$this->fileSystem->mkdir($folder, FS_CHMOD_DIR)) {
                     $errors[] = new \WP_Error(500, 'Required folder creation failed: ' . $folder);
                 }
             }
