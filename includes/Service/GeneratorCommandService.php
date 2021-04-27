@@ -90,6 +90,12 @@ class GeneratorCommandService implements TaskServiceInterface
                     'type'        => 'assoc',
                     'optional'    => true,
                 ],
+                [
+                    'name'        => 'output_type',
+                    'description' => 'Leave empty for a bare plugin architecture, set CPT for a custom post type generation.',
+                    'type'        => 'assoc',
+                    'optional'    => true,
+                ],
             ],
             'longdesc'  => '## EXAMPLES' . "\n\n" . 'wp generate-plugin --name="myPluginName" --desc="This is my plugin description" --namespace="WonderWp\Plugin\MyPluginNameSpace"',
         ];

@@ -39,11 +39,7 @@ class __PLUGIN_ENTITY__Manager extends __PLUGIN_PARENT_MANAGER__
         $this->addController(AbstractManager::ADMIN_CONTROLLER_TYPE, function () {
             return new __PLUGIN_ENTITY__AdminController($this);
         });
-        /* Uncomment this if your plugin has a public controller
-        $this->addController(AbstractManager::PUBLIC_CONTROLLER_TYPE, function () {
-            return $plugin_public = new __PLUGIN_ENTITY__PublicController($this);
-        });
-        */
+        //__PLUGIN_ENTITY_CONTROLLERS__//
 
         // Register Services
         $this->addService(ServiceInterface::HOOK_SERVICE_NAME, function () {
@@ -63,13 +59,18 @@ class __PLUGIN_ENTITY__Manager extends __PLUGIN_PARENT_MANAGER__
             return new __PLUGIN_ENTITY__RouteService();
         });
         */
+        /* Uncomment this if your plugin needs to register particular shortcodes, then create the __PLUGIN_ENTITY__ShortcodeService class in the include folder
+        $this->addService(ServiceInterface::SHORT_CODE_SERVICE_NAME, function () {
+            // Route service
+            return new __PLUGIN_ENTITY__ShortcodeService();
+        });
+        */
         /* Uncomment this if your plugin has page settings, then create the __PLUGIN_ENTITY__PageSettingsService class in the include folder
         $this->addService(ServiceInterface::PAGE_SETTINGS_SERVICE_NAME, function () {
             // Page settings service
             return new __PLUGIN_ENTITY__PageSettingsService();
         });
         */
-
         /* Uncomment this if your plugin has an api, then create the __PLUGIN_ENTITY__ApiService class in the include folder
         $this->addService(ServiceInterface::API_SERVICE_NAME, function () {
             //  Api service

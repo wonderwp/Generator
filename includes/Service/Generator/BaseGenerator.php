@@ -1,12 +1,16 @@
 <?php
 
-namespace WonderWp\Plugin\Generator\Service;
+namespace WonderWp\Plugin\Generator\Service\Generator;
 
 use WonderWp\Component\DependencyInjection\Container;
-use WonderWp\Component\HttpFoundation\Result;
+use WonderWp\Component\Logging\LoggerInterface;
+use WonderWp\Component\Logging\VoidLogger;
+use WonderWp\Component\Logging\WpCliLogger;
 use WonderWp\Plugin\Generator\GeneratorManager;
+use WonderWp\Plugin\Generator\Result\DataCheckResult;
+use WonderWp\Plugin\Generator\Result\GenerationResult;
 
-class GeneratorService
+class BaseGenerator implements GeneratorInterface
 {
 
     /** @var string[] */
@@ -19,6 +23,8 @@ class GeneratorService
     protected $fileSystem;
     /** @var array */
     protected $folders;
+    /** @var LoggerInterface */
+    protected $logger;
 
     /**
      * @return string[]
@@ -28,14 +34,18 @@ class GeneratorService
         return $this->data;
     }
 
-    /**
-     * @param string[] $data
-     *
-     * @return static
-     */
-    public function setData($data)
+    /** @inheritDoc */
+    public function setData(array $data)
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    /** @inheritDoc */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
 
         return $this;
     }
@@ -46,19 +56,15 @@ class GeneratorService
         $this->container  = Container::getInstance();
         $this->fileSystem = $this->container['wwp.fileSystem'];
         $this->manager    = $this->container['wonderwp_generator.Manager'];
+        $this->logger     = new VoidLogger();
     }
 
-
+    /** @inheritDoc */
     public function generate()
     {
-
         $check = $this->checkDatas();
-        if ($check->getCode() === 200) {
-            $msg = "Starting Generation of the " . $this->data['name'] . " plugin.";
-            if(class_exists('WP_CLI')) {
-                \WP_CLI::line($msg);
-            }
 
+        if ($check->getCode() === 200) {
             try {
                 $this
                     ->prepareDatas()
@@ -72,18 +78,14 @@ class GeneratorService
                     ->generateAdminController()//✓
                 ;
             } catch (\Exception $e) {
-                if(class_exists('WP_CLI')) {
-                    \WP_CLI::error($e->getMessage(), true);
-                }
+                return new GenerationResult(500, ['msg' => $e->getMessage(), 'exception' => $e]);
             }
 
-            if(class_exists('WP_CLI')) {
-                \WP_CLI::success('Plugin generation finished');
-            }
+            return new GenerationResult(200, ['msg' => 'Plugin generation completed']);
         } else {
-            if(class_exists('WP_CLI')) {
-                \WP_CLI::error(implode("\n", $check->getData('errors')), true);
-            }
+            $errors = $check->getData('errors');
+
+            return new GenerationResult(500, ['msg' => implode("\n", $errors), 'errors' => $errors]);
         }
     }
 
@@ -98,13 +100,14 @@ class GeneratorService
         }
         $code = empty($errors) ? 200 : 403;
 
-        return new Result($code, ['datas' => $this->data, 'errors' => $errors]);
+        return new DataCheckResult($code, ['datas' => $this->data, 'errors' => $errors]);
     }
 
     protected function prepareDatas()
     {
         if (empty($this->data['classprefix'])) {
-            $this->data['classprefix'] = @end(explode('\\', $this->data['namespace']));
+            $frags                     = explode('\\', $this->data['namespace']);
+            $this->data['classprefix'] = end($frags);
         }
         $this->data['className'] = $this->data['classprefix'];
 
@@ -200,6 +203,14 @@ class GeneratorService
             '__PLUGIN_PARENT_MANAGER_NAMESPACE__' => 'WonderWp\Component\PluginSkeleton\AbstractPluginManager',
             '__PLUGIN_PARENT_MANAGER__'           => 'AbstractPluginManager',
             '//__PLUGIN_EXTRA_USES//'             => '',
+            '//__PLUGIN_ENTITY_CONTROLLERS__//'   => <<<'EOD'
+        /* Uncomment this if your plugin has a public controller
+        $this->addController(AbstractManager::PUBLIC_CONTROLLER_TYPE, function () {
+            return $plugin_public = new __PLUGIN_ENTITY__PublicController($this);
+        });
+        */
+EOD
+            ,
         ];
 
         $replacements['//__PLUGIN_ENTITY_SERVICES__//'] = $this->replacePlaceholders(<<<'EOD'
@@ -251,7 +262,34 @@ EOD
      */
     protected function generateHookService()
     {
-        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__HookService.php');
+        $replacements = [
+            '//__PLUGIN_HOOKS_EXTRA_USES__//'         => $this->replacePlaceholders(<<<'EOD'
+use WonderWp\Component\PluginSkeleton\AbstractManager;
+EOD
+            ),
+            '//__PLUGIN_HOOKS_EXTRA_DECLARATIONS__//' => $this->replacePlaceholders(<<<'EOD'
+        //Menus
+        //add_action('admin_menu', [$this, 'customizeMenus']); //If you want to add a link to your plugin in the admin menu, uncomment this then modify the customizeMenus method
+EOD)
+            ,
+            '//__PLUGIN_HOOKS_EXTRA_CALLABLES__//'    => $this->replacePlaceholders(<<<'EOD'
+/**
+     * Add entry under top-level functionalities menu
+     */
+    public function customizeMenus()
+    {
+        //Get admin controller
+        $adminController = $this->manager->getController(AbstractManager::ADMIN_CONTROLLER_TYPE);
+        $callable        = [$adminController, 'route'];
+
+        //Add entry in admin menu
+        add_menu_page('__PLUGIN_NAME__', '__PLUGIN_NAME__', 'read', WWP_PLUGIN___PLUGIN_CONST___NAME, $callable);
+    }
+EOD)
+            ,
+
+        ];
+        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__HookService.php', $replacements);
 
         return $this;
     }
