@@ -43,6 +43,8 @@ class CPTGenerator extends BaseGenerator
     protected function getManagerConfigContent()
     {
         return <<<'EOD'
+        
+        $this->setConfig('plugin.capability', $this->getConfig('plugin.capability', 'edit_posts'));
         $this->setConfig('cpt', $this->getConfig('cpt', new __PLUGIN_CLASSNAME__CPT('',[
             'capabilities'        => [
                 'delete_posts'        => $this->getConfig('plugin.capability'),
