@@ -20,7 +20,7 @@ class CPTGenerator extends BaseGenerator
             return new Result(500, ['msg' => $e->getMessage(), 'data' => $e->getTrace()]);
         }
 
-        return new Result(200, ['msg' => 'Plugin generated']);
+        return new Result(200, ['msg' => "Plugin generated in your plugins folder. Don't forget to add an autoload entry in your composer.json file, then to launch a composer dump-autoload command, if you'd like to use it right away."]);
     }
 
     protected function generateCpt()
