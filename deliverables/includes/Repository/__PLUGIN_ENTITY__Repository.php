@@ -1,8 +1,8 @@
 <?php
 
-namespace __PLUGIN_NS__\repository;
+namespace __PLUGIN_NS__\Repository;
 
-use WonderWp\Plugin\Core\Framework\Repository\PostRepository;
+use WonderWp\Component\Repository\PostRepository;
 
 class __PLUGIN_ENTITY__Repository extends PostRepository
 {
