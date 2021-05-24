@@ -92,7 +92,7 @@ EOD
         });
         $this->addService(ServiceInterface::ACTIVATOR_NAME, function () {
             //  Activator service
-            return new __PLUGIN_ENTITY__Activator($this);
+            return new __PLUGIN_ENTITY__Activator($this->getVersion());
         });
 EOD
         );
