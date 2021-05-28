@@ -274,7 +274,7 @@ EOD)
             ,
             '//__PLUGIN_HOOKS_EXTRA_CALLABLES__//'    => $this->replacePlaceholders(<<<'EOD'
 /**
-     * Add entry under top-level functionalities menu
+     * Add plugin menu entry in admin menu
      */
     public function customizeMenus()
     {
