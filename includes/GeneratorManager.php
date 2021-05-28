@@ -5,8 +5,9 @@ namespace WonderWp\Plugin\Generator;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\PluginSkeleton\AbstractPluginManager;
 use WonderWp\Component\Service\ServiceInterface;
+use WonderWp\Plugin\Generator\Service\Generator\Base\BaseGenerator;
+use WonderWp\Plugin\Generator\Service\Generator\CPT\CPTGenerator;
 use WonderWp\Plugin\Generator\Service\GeneratorCommandService;
-use WonderWp\Plugin\Generator\Service\GeneratorService;
 
 class GeneratorManager extends AbstractPluginManager
 {
@@ -25,7 +26,10 @@ class GeneratorManager extends AbstractPluginManager
         });
 
         $this->addService('generator', function () {
-            return new GeneratorService();
+            return new BaseGenerator($this);
+        });
+        $this->addService('CPTGenerator', function () {
+            return new CPTGenerator($this);
         });
 
         return $this;

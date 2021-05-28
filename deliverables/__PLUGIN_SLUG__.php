@@ -14,8 +14,9 @@
 
 use WonderWp\Component\PluginSkeleton\Service\ActivatorInterface;
 use WonderWp\Component\PluginSkeleton\Service\DeactivatorInterface;
-use WonderWp\Component\PluginSkeleton\ManagerInterface;
 use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\PluginSkeleton\ManagerInterface;
+use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Component\Service\ServiceInterface;
 use __PLUGIN_NS__\__PLUGIN_ENTITY__Manager;
 
@@ -34,26 +35,28 @@ if (!defined('WWP_PLUGIN___PLUGIN_CONST___MANAGER')) {
 /**
  * Register activation hook
  * The code that runs during plugin activation.
- * This action is documented in includes/ErActivator.php
  */
 register_activation_hook(__FILE__, function () {
-    $activator = Container::getInstance()->offsetGet(WWP_PLUGIN___PLUGIN_CONST___NAME . '.Manager')->getService(ServiceInterface::ACTIVATOR_NAME);
-
-    if ($activator instanceof ActivatorInterface) {
+    try {
+        /** @var ActivatorInterface $activator */
+        $activator = Container::getInstance()->offsetGet(WWP_PLUGIN___PLUGIN_CONST___NAME . '.Manager')->getService(ServiceInterface::ACTIVATOR_NAME);
         $activator->activate();
+    } catch (ServiceNotFoundException $e) {
+        //This plugin hasn't registered an activator
     }
 });
 
 /**
  * Register deactivation hook
  * The code that runs during plugin deactivation.
- * This action is documented in includes/MembreDeactivator.php
  */
 /*register_deactivation_hook(__FILE__, function () {
-    $deactivator = Container::getInstance()->offsetExists(WWP_PLUGIN___PLUGIN_CONST___NAME . '.Manager') ? Container::getInstance()->offsetGet(WWP_PLUGIN___PLUGIN_CONST___NAME . '.Manager')->getService(ServiceInterface::DEACTIVATOR_NAME) : null;
-
-    if ($deactivator instanceof DeactivatorInterface) {
+    try {
+        /** @var DeactivatorInterface $deactivator *//*
+        $deactivator = Container::getInstance()->offsetExists(WWP_PLUGIN___PLUGIN_CONST___NAME . '.Manager') ? Container::getInstance()->offsetGet(WWP_PLUGIN___PLUGIN_CONST___NAME . '.Manager')->getService(ServiceInterface::DEACTIVATOR_NAME) : null;
         $deactivator->deactivate();
+    } catch (ServiceNotFoundException $e) {
+        //This plugin hasn't registered a deactivator
     }
 });*/
 

@@ -4,19 +4,19 @@ namespace WonderWp\Plugin\Generator\Service;
 
 use WonderWp\Component\Task\TaskServiceInterface;
 use WonderWp\Plugin\Generator\Command\PluginGeneratorCommand;
+use WP_CLI;
 
 class GeneratorCommandService implements TaskServiceInterface
 {
     const COMMAND_NAME = 'generate-plugin';
 
-    /** @inheritdoc */
     public function register()
     {
         if (!class_exists('WP_CLI')) {
             return;
         }
 
-        \WP_CLI::add_command(self::COMMAND_NAME, PluginGeneratorCommand::class, $this->getGeneratorCommandArgs());
+        WP_CLI::add_command(self::COMMAND_NAME, PluginGeneratorCommand::class, $this->getGeneratorCommandArgs());
     }
 
     protected function getGeneratorCommandArgs(){
@@ -87,6 +87,12 @@ class GeneratorCommandService implements TaskServiceInterface
                 [
                     'name'        => 'domain_path',
                     'description' => ' The domain path let WordPress know where to find the translations. More information can be found in the Domain Path section of the How to Internationalize your Plugin page.',
+                    'type'        => 'assoc',
+                    'optional'    => true,
+                ],
+                [
+                    'name'        => 'output_type',
+                    'description' => 'Leave empty for a bare plugin architecture, set CPT for a custom post type generation.',
                     'type'        => 'assoc',
                     'optional'    => true,
                 ],
