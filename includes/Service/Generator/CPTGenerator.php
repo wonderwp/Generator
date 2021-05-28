@@ -3,13 +3,14 @@
 namespace WonderWp\Plugin\Generator\Service\Generator;
 
 use WonderWp\Component\HttpFoundation\Result;
+use WonderWp\Plugin\Generator\Result\GenerationResult;
 
 class CPTGenerator extends BaseGenerator
 {
     public function generate()
     {
         try {
-            parent::generate();
+            $result = parent::generate();
             $this
                 ->generateCPT()
                 ->generateRepository()
@@ -17,10 +18,10 @@ class CPTGenerator extends BaseGenerator
                 ->generateLanguages()
             ;
         } catch (\Exception $e) {
-            return new Result(500, ['msg' => $e->getMessage(), 'data' => $e->getTrace()]);
+            return new GenerationResult(500, ['msg' => $e->getMessage(), 'data' => $e->getTrace()]);
         }
 
-        return new Result(200, ['msg' => "Plugin generated in your plugins folder. Don't forget to add an autoload entry in your composer.json file, then to launch a composer dump-autoload command, if you'd like to use it right away."]);
+        return $result;
     }
 
     protected function generateCpt()

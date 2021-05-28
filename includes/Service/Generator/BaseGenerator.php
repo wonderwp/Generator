@@ -81,7 +81,11 @@ class BaseGenerator implements GeneratorInterface
                 return new GenerationResult(500, ['msg' => $e->getMessage(), 'exception' => $e]);
             }
 
-            return new GenerationResult(200, ['msg' => 'Plugin generation completed']);
+            return new GenerationResult(200, ['msg' => "
+Plugin generated in your plugins folder.
+Don't forget to add an autoload entry in your composer.json file, then to launch a composer dump-autoload command, if you'd like to use it right away.
+More information in the documentation : http://wonderwp.net/Creating_a_plugin/Getting_Started
+"]);
         } else {
             $errors = $check->getData('errors');
 
