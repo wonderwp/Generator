@@ -1,24 +1,53 @@
 <?php
 
-namespace WonderWp\Plugin\Generator\Service;
+namespace WonderWp\Plugin\Generator\Service\Generator\Base;
 
+use Exception;
+use RuntimeException;
 use WonderWp\Component\DependencyInjection\Container;
-use WonderWp\Component\HttpFoundation\Result;
+use WonderWp\Component\Logging\LoggerInterface;
+use WonderWp\Component\Logging\VoidLogger;
+use WonderWp\Component\PluginSkeleton\AbstractManager;
 use WonderWp\Plugin\Generator\GeneratorManager;
+use WonderWp\Plugin\Generator\Result\DataCheckResult;
+use WonderWp\Plugin\Generator\Result\GenerationResult;
+use WonderWp\Plugin\Generator\Service\Generator\Base\ContentProvider\BaseActivatorContentProvider;
+use WonderWp\Plugin\Generator\Service\Generator\Base\ContentProvider\BaseAdminControllerContentProvider;
+use WonderWp\Plugin\Generator\Service\Generator\Base\ContentProvider\BaseHookServiceContentProvider;
+use WonderWp\Plugin\Generator\Service\Generator\Base\ContentProvider\BaseManagerContentProvider;
+use WonderWp\Plugin\Generator\Service\Generator\GeneratorInterface;
+use WP_Error;
+use WP_Filesystem_Direct;
+use function WonderWp\Functions\array_merge_recursive_distinct;
 
-class GeneratorService
+class BaseGenerator implements GeneratorInterface
 {
 
+    //Attributes
     /** @var string[] */
     protected $data;
+    /** @var array */
+    protected $folders;
+
+    //Utils
     /** @var Container */
     protected $container;
     /** @var GeneratorManager */
     protected $manager;
-    /** @var  \WP_Filesystem_Direct */
+    /** @var  WP_Filesystem_Direct */
     protected $fileSystem;
-    /** @var array */
-    protected $folders;
+    /** @var LoggerInterface */
+    protected $logger;
+
+    //Content Providers
+    /** @var BaseManagerContentProvider */
+    protected $managerContentProvider;
+    /** @var BaseActivatorContentProvider */
+    protected $activatorContentProvider;
+    /** @var BaseHookServiceContentProvider */
+    protected $hookServiceContentProvider;
+    /** @var BaseAdminControllerContentProvider */
+    protected $adminControllerContentProvider;
 
     /**
      * @return string[]
@@ -28,62 +57,69 @@ class GeneratorService
         return $this->data;
     }
 
-    /**
-     * @param string[] $data
-     *
-     * @return static
-     */
-    public function setData($data)
+    /** @inheritDoc */
+    public function setData(array $data)
     {
         $this->data = $data;
 
         return $this;
     }
 
+    /** @inheritDoc */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
     /** Constructor */
-    public function __construct()
+    public function __construct(AbstractManager $manager)
     {
         $this->container  = Container::getInstance();
         $this->fileSystem = $this->container['wwp.fileSystem'];
-        $this->manager    = $this->container['wonderwp_generator.Manager'];
+        $this->manager    = $manager;
+        $this->logger     = new VoidLogger();
+
+        $this->managerContentProvider         = new BaseManagerContentProvider();
+        $this->activatorContentProvider       = new BaseActivatorContentProvider();
+        $this->hookServiceContentProvider     = new BaseHookServiceContentProvider();
+        $this->adminControllerContentProvider = new BaseAdminControllerContentProvider();
     }
 
-
+    /** @inheritDoc */
     public function generate()
     {
-
         $check = $this->checkDatas();
-        if ($check->getCode() === 200) {
-            $msg = "Starting Generation of the " . $this->data['name'] . " plugin.";
-            if(class_exists('WP_CLI')) {
-                \WP_CLI::line($msg);
-            }
 
+        if ($check->getCode() === 200) {
             try {
                 $this
                     ->prepareDatas()
                     ->createBaseFolders()
                     ->generateIndexFile()
-                    ->generateBootstrapFile()//✓
-                    ->generateManager()//✓
-                    ->generateActivator()//✓
-                    ->generateDeActivator()//
-                    ->generateHookService()//✓
-                    ->generateAdminController()//✓
+                    ->generateBootstrapFile()
+                    ->generateManager()
+                    ->generateActivator()
+                    ->generateDeActivator()
+                    ->generateHookService()
+                    ->generateAdminController()
                 ;
-            } catch (\Exception $e) {
-                if(class_exists('WP_CLI')) {
-                    \WP_CLI::error($e->getMessage(), true);
-                }
+            } catch (Exception $e) {
+                return new GenerationResult(500, ['msg' => $e->getMessage(), 'exception' => $e]);
             }
 
-            if(class_exists('WP_CLI')) {
-                \WP_CLI::success('Plugin generation finished');
-            }
+            return new GenerationResult(200, [
+                'msg' => "
+Plugin generated in your plugins folder.
+Don't forget to add an autoload entry in your composer.json file, then to launch a composer dump-autoload command, if you'd like to use it right away.
+More information in the documentation : http://wonderwp.net/Creating_a_plugin/Getting_Started
+",
+            ]);
         } else {
-            if(class_exists('WP_CLI')) {
-                \WP_CLI::error(implode("\n", $check->getData('errors')), true);
-            }
+            $errors = $check->getData('errors');
+
+            return new GenerationResult(500, ['msg' => implode("\n", $errors), 'errors' => $errors]);
         }
     }
 
@@ -98,13 +134,14 @@ class GeneratorService
         }
         $code = empty($errors) ? 200 : 403;
 
-        return new Result($code, ['datas' => $this->data, 'errors' => $errors]);
+        return new DataCheckResult($code, ['datas' => $this->data, 'errors' => $errors]);
     }
 
     protected function prepareDatas()
     {
         if (empty($this->data['classprefix'])) {
-            $this->data['classprefix'] = @end(explode('\\', $this->data['namespace']));
+            $frags                     = explode('\\', $this->data['namespace']);
+            $this->data['classprefix'] = end($frags);
         }
         $this->data['className'] = $this->data['classprefix'];
 
@@ -124,13 +161,13 @@ class GeneratorService
         foreach ($this->folders as $folder) {
             if (!is_dir($folder)) {
                 if (!$this->fileSystem->mkdir($folder, FS_CHMOD_DIR)) {
-                    $errors[] = new \WP_Error(500, 'Required folder creation failed: ' . $folder);
+                    $errors[] = new WP_Error(500, 'Required folder creation failed: ' . $folder);
                 }
             }
         }
 
         if (!empty($errors)) {
-            throw new \Exception('Plugin generation error : ' . implode("\n", $errors));
+            throw new Exception('Plugin base folders generation error : ' . implode("\n", $errors));
         }
 
         return $this;
@@ -192,27 +229,18 @@ class GeneratorService
     /**
      * @return self
      */
-    protected function generateManager()
+    protected function generateManager($givenReplacements = [])
     {
-        $replacements = [
-            '//__PLUGIN_ENTITY_CONFIG__//'        => '',
-            '//__PLUGIN_ENTITY_SERVICES__//'      => '',
+        $baseReplacements = [
+            '//__MANAGER_EXTRA_USES//'            => $this->replacePlaceholders($this->managerContentProvider->getUsesContent()),
+            '//__MANAGER_EXTRA_CONFIG__//'        => $this->replacePlaceholders($this->managerContentProvider->getConfigContent()),
+            '//__MANAGER_EXTRA_CONTROLLERS__//'   => $this->replacePlaceholders($this->managerContentProvider->getControllersContent()),
+            '//__MANAGER_EXTRA_SERVICES__//'      => $this->replacePlaceholders($this->managerContentProvider->getServicesContent()),
             '__PLUGIN_PARENT_MANAGER_NAMESPACE__' => 'WonderWp\Component\PluginSkeleton\AbstractPluginManager',
             '__PLUGIN_PARENT_MANAGER__'           => 'AbstractPluginManager',
-            '//__PLUGIN_EXTRA_USES//'             => '',
         ];
 
-        $replacements['//__PLUGIN_ENTITY_SERVICES__//'] = $this->replacePlaceholders(<<<'EOD'
-
-        $this->addService(ServiceInterface::ACTIVATOR_NAME, function () {
-            //  Activator service
-            return new __PLUGIN_ENTITY__Activator($this);
-        });
-
-EOD
-        );
-
-        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__Manager.php', $replacements);
+        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__Manager.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements));
 
         return $this;
     }
@@ -220,19 +248,16 @@ EOD
     /**
      * @return self
      */
-    protected function generateActivator()
+    protected function generateActivator($givenReplacements = [])
     {
-        $replacements = [
-            '//__PLUGIN_ACTIVATION_TASKS__//' => <<<'EOD'
-        $this->copyLanguageFiles(dirname(dirname(__DIR__)) . '/languages');
-EOD
-            ,
+        $baseReplacements = [
+            '//__ACTIVATOR_EXTRA_USES//'            => $this->replacePlaceholders($this->activatorContentProvider->getUsesContent()),
+            '//__PLUGIN_ACTIVATION_TASKS__//'       => $this->replacePlaceholders($this->activatorContentProvider->getActivationTasksContent()),
+            '__PLUGIN_PARENT_ACTIVATOR_NAMESPACE__' => 'WonderWp\Component\PluginSkeleton\Service\AbstractPluginActivator',
+            '__PLUGIN_PARENT_ACTIVATOR__'           => 'AbstractPluginActivator',
         ];
 
-        $replacements['__PLUGIN_PARENT_ACTIVATOR_NAMESPACE__'] = 'WonderWp\Component\PluginSkeleton\Service\AbstractPluginActivator';
-        $replacements['__PLUGIN_PARENT_ACTIVATOR__']           = 'AbstractPluginActivator';
-
-        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__Activator.php', $replacements);
+        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__Activator.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements));
 
         return $this;
     }
@@ -240,7 +265,7 @@ EOD
     /**
      * @return self
      */
-    protected function generateDeActivator()
+    protected function generateDeActivator($givenReplacements = [])
     {
         // TODO
         return $this;
@@ -249,9 +274,14 @@ EOD
     /**
      * @return self
      */
-    protected function generateHookService()
+    protected function generateHookService($givenReplacements = [])
     {
-        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__HookService.php');
+        $baseReplacements = [
+            '//__PLUGIN_HOOKS_EXTRA_USES__//'         => $this->replacePlaceholders($this->hookServiceContentProvider->getUsesContent()),
+            '//__PLUGIN_HOOKS_EXTRA_DECLARATIONS__//' => $this->replacePlaceholders($this->hookServiceContentProvider->getHooksDeclarationsContent()),
+            '//__PLUGIN_HOOKS_EXTRA_CALLABLES__//'    => $this->replacePlaceholders($this->hookServiceContentProvider->getHooksCallablesContent()),
+        ];
+        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__HookService.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements));
 
         return $this;
     }
@@ -259,24 +289,24 @@ EOD
     /**
      * @return self
      */
-    protected function generateAdminController()
+    protected function generateAdminController($givenReplacements = [])
     {
-        $replacements = [
-            '//__PLUGIN_DEFAULT_ACTION__//'          => '',
+        $baseReplacements = [
+            '//__PLUGIN_DEFAULT_ACTION__//'          => $this->replacePlaceholders($this->adminControllerContentProvider->getDefaultActionContent()),
             '__PLUGIN_PARENT_CONTROLLER_NAMESPACE__' => 'WonderWp\Component\PluginSkeleton\Controller\AbstractPluginBackendController',
             '__PLUGIN_PARENT_CONTROLLER__'           => 'AbstractPluginBackendController',
         ];
 
-        if (!empty($this->data['table'])) {
+        /*if (!empty($this->data['table'])) {
             $replacements['//__PLUGIN_DEFAULT_ACTION__//'] = <<<'EOD'
 
         public function defaultAction()
         {
         }
 EOD;
-        }
+        }*/
 
-        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__AdminController.php', $replacements);
+        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__AdminController.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements));
 
         return $this;
     }
@@ -292,7 +322,7 @@ EOD;
         $src = implode(DIRECTORY_SEPARATOR, [$this->manager->getConfig('path.root'), 'deliverables', $deliverable]);
 
         if (!$this->fileSystem->exists($src) || !$this->fileSystem->is_readable($src)) {
-            throw new \RuntimeException(sprintf('The deliverable file "%s" does not exist or is not readable', $src));
+            throw new RuntimeException(sprintf('The deliverable file "%s" does not exist or is not readable', $src));
         }
 
         $content = $this->replacePlaceholders($this->fileSystem->get_contents($src), $replacements);
