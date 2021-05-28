@@ -15,7 +15,7 @@ class PluginGeneratorCommand
     /** @var LoggerInterface */
     protected $logger;
 
-    public function __invoke($args, $assocArgs)
+    public function __invoke(array $args = [], array $assocArgs = [])
     {
         $container = Container::getInstance();
         /** @var GeneratorManager $manager */
@@ -33,13 +33,21 @@ class PluginGeneratorCommand
                 return false;
             }
         } else {
-            $generator = $manager->getService('generator');
+            $type = "basic";
+            try {
+                $generator = $manager->getService('generator');
+            } catch (ServiceNotFoundException $e) {
+                $this->logger->error($e->getMessage());
+
+                return false;
+            }
         }
 
         $generator->setLogger($this->logger);
 
         if (!empty($assocArgs)) {
-            $this->logger->info("Starting Generation of the " . $assocArgs['name'] . " plugin.");
+            $this->logger->info("Starting Generation of the `" . $assocArgs['name'] . "` plugin, which is a `$type` plugin");
+            $this->logger->info("Based on type `$type`, using the `" . get_class($generator) . "` generator.");
             $generator->setData($assocArgs);
             $generationResult = $generator->generate();
             if ($generationResult->getCode() === 200) {
@@ -52,5 +60,6 @@ class PluginGeneratorCommand
             $this->logger->error('No data given to the generator. Not enough context provided to generate a plugin');
         }
 
+        return true;
     }
 }

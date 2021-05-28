@@ -3,6 +3,7 @@
 namespace __PLUGIN_NS__\Service;
 
 use __PLUGIN_PARENT_ACTIVATOR_NAMESPACE__;
+//__ACTIVATOR_EXTRA_USES//
 
 /**
  * Fired during plugin activation.
@@ -13,7 +14,7 @@ use __PLUGIN_PARENT_ACTIVATOR_NAMESPACE__;
 class __PLUGIN_ENTITY__Activator extends __PLUGIN_PARENT_ACTIVATOR__
 {
     /**
-     * Create table for entity
+     * Actions that will be performed upon plugin activation
      */
     public function activate()
     {

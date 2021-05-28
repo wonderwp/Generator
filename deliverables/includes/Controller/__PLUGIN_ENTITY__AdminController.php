@@ -6,11 +6,15 @@ use __PLUGIN_PARENT_CONTROLLER_NAMESPACE__;
 
 /**
  * The admin-specific functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
  */
 class __PLUGIN_ENTITY__AdminController extends __PLUGIN_PARENT_CONTROLLER__
 {
-    // Create here the method to call for you different routes//__PLUGIN_DEFAULT_ACTION__//
+    /**
+     * Create here the method to call for your different admin pages
+     * By default the defaultAction() is called.
+     * You can override this method here or the getDefaultRoute one or the getTabs one
+     * @see http://wonderwp.net/Creating_a_plugin/Plugin_architecture/Admin_controller
+     */
+
+    //__PLUGIN_DEFAULT_ACTION__//
 }

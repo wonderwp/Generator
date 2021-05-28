@@ -2,7 +2,6 @@
 
 namespace __PLUGIN_NS__\Service;
 
-use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Hook\AbstractHookService;//__PLUGIN_HOOKS_EXTRA_USES__//
 
 /**
@@ -16,9 +15,6 @@ class __PLUGIN_ENTITY__HookService extends AbstractHookService
      */
     public function register()
     {
-        // Get Manager
-        $container     = Container::getInstance();
-        $this->manager = $container->offsetGet(WWP_PLUGIN___PLUGIN_CONST___NAME.'.Manager');
 
         /**
          * Admin Hooks

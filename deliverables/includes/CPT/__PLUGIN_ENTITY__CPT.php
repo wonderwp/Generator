@@ -17,7 +17,6 @@ class __PLUGIN_ENTITY__CPT extends CustomPostType
      */
     public function __construct($name = '', array $passed_opts = [], $taxonomy_name = '', array $passed_taxonomy_opts = [])
     {
-        $name        = WWP_PLUGIN___PLUGIN_CONST___NAME;
         $defaultOpts = [
             'labels'       => [
                 //CPT labels can be edited below
