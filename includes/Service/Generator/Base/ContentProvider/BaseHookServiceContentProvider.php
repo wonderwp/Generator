@@ -46,4 +46,9 @@ EOD;
     }
 EOD;
     }
+
+    public function getHooksClassAttributes()
+    {
+        return '';
+    }
 }
