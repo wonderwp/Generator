@@ -280,6 +280,7 @@ More information in the documentation : http://wonderwp.net/Creating_a_plugin/Ge
             '//__PLUGIN_HOOKS_EXTRA_USES__//'         => $this->replacePlaceholders($this->hookServiceContentProvider->getUsesContent()),
             '//__PLUGIN_HOOKS_EXTRA_DECLARATIONS__//' => $this->replacePlaceholders($this->hookServiceContentProvider->getHooksDeclarationsContent()),
             '//__PLUGIN_HOOKS_EXTRA_CALLABLES__//'    => $this->replacePlaceholders($this->hookServiceContentProvider->getHooksCallablesContent()),
+            '//__PLUGIN_HOOKS_CLASS_ATTRIBUTES__//'    => $this->replacePlaceholders($this->hookServiceContentProvider->getHooksClassAttributes()),
         ];
         $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__HookService.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements));
 
