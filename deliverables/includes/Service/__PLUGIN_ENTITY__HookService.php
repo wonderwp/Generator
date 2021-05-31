@@ -9,6 +9,7 @@ use WonderWp\Component\Hook\AbstractHookService;//__PLUGIN_HOOKS_EXTRA_USES__//
  */
 class __PLUGIN_ENTITY__HookService extends AbstractHookService
 {
+    //__PLUGIN_HOOKS_CLASS_ATTRIBUTES__//
     /**
      * Run
      * @return $this
