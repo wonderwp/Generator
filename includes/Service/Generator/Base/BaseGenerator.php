@@ -223,6 +223,8 @@ More information in the documentation : http://wonderwp.net/Creating_a_plugin/Ge
             '__PLUGIN_METAS__' => $pluginMetasString,
         ]);
 
+        $this->importDeliverable('__PLUGIN_SLUG__-constants.php');
+
         return $this;
     }
 
