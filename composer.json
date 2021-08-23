@@ -1,25 +1,31 @@
 {
-    "name": "wonderwp/generator-wwp",
-    "description": "WonderWP Plugin Generator",
-    "type": "wordpress-muplugin",
-    "authors": [
-        {
-            "name": "Jeremy Desvaux",
-            "email": "jeremy.desvaux@wonderful.fr"
-        }
-    ],
-    "require": {
-        "php": "~5.6|~7",
-        "wp-cli/wp-cli": "^2.5",
-        "wonderwp/http-foundation": "^1.0",
-        "wonderwp/dependency-injection": "^1.0",
-        "wonderwp/task": "^1.0"
+  "name": "wonderwp/generator-wwp",
+  "description": "WonderWP Plugin Generator",
+  "type": "wordpress-muplugin",
+  "keywords": ["Generator", "Code generator", "WonderWp", "WordPress"],
+  "homepage": "https://github.com/wonderwp/Generator",
+  "authors": [
+    {
+      "name": "Jeremy Desvaux",
+      "homepage": "https://jdmweb.com"
     },
-    "autoload": {
-        "psr-4": {"WonderWp\\Plugin\\Generator\\": "includes"},
-        "exclude-from-classmap": [
-            "/tests/"
-        ]
-    },
-    "minimum-stability": "dev"
+    {
+      "name": "WonderWp Community",
+      "homepage": "http://wonderwp.net/Contribution/Contributors.html"
+    }
+  ],
+  "require": {
+    "php": ">=7.1",
+    "wp-cli/wp-cli": "^2.5",
+    "wonderwp/http-foundation": "^1.0",
+    "wonderwp/dependency-injection": "^1.0",
+    "wonderwp/task": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {"WonderWp\\Plugin\\Generator\\": "includes"},
+    "exclude-from-classmap": [
+      "/tests/"
+    ]
+  },
+  "minimum-stability": "dev"
 }
