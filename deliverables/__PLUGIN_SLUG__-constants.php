@@ -1,0 +1,8 @@
+<?php
+
+define('WWP_PLUGIN___PLUGIN_CONST___NAME', '__PLUGIN_SLUG__');
+define('WWP_PLUGIN___PLUGIN_CONST___VERSION', '1.0.0');
+define('WWP___PLUGIN_CONST___TEXTDOMAIN', '__PLUGIN_SLUG__');
+if (!defined('WWP_PLUGIN___PLUGIN_CONST___MANAGER')) {
+    define('WWP_PLUGIN___PLUGIN_CONST___MANAGER',__PLUGIN_NS__\__PLUGIN_ENTITY__Manager::class);
+}
