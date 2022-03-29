@@ -53,8 +53,14 @@ class PluginGeneratorCommand
             if ($generationResult->getCode() === 200) {
                 $this->logger->success($generationResult->getData('msg'));
             } else {
-                $this->logger->error($generationResult->getData('msg'));
-                $this->logger->debug($generationResult);
+                $this->logger->error($generationResult->getData('msg'), ['exit' => false]);
+                $exception = $generationResult->getData('exception');
+                if (!empty($exception)) {
+                    if (empty($assocArgs['debug']) || $assocArgs['debug'] !== 'generator') {
+                        $this->logger->info('More information about the error can be seen by adding the --debug=generator flag to your command.');
+                    }
+                    $this->logger->debug(print_r($exception, true), ['group' => 'generator']);
+                }
             }
         } else {
             $this->logger->error('No data given to the generator. Not enough context provided to generate a plugin');
