@@ -1,6 +1,6 @@
 <?php
 
-namespace WonderWp\Plugin\Generator\Service\Generator\Base;
+namespace WonderWp\Plugin\Generator\Generator\Plugin\Base;
 
 use Exception;
 use RuntimeException;
@@ -8,37 +8,20 @@ use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Logging\LoggerInterface;
 use WonderWp\Component\Logging\VoidLogger;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
+use WonderWp\Plugin\Generator\Generator\Definition\AbstractGenerator;
 use WonderWp\Plugin\Generator\GeneratorManager;
 use WonderWp\Plugin\Generator\Result\DataCheckResult;
 use WonderWp\Plugin\Generator\Result\GenerationResult;
-use WonderWp\Plugin\Generator\Service\Generator\Base\ContentProvider\BaseActivatorContentProvider;
-use WonderWp\Plugin\Generator\Service\Generator\Base\ContentProvider\BaseAdminControllerContentProvider;
-use WonderWp\Plugin\Generator\Service\Generator\Base\ContentProvider\BaseHookServiceContentProvider;
-use WonderWp\Plugin\Generator\Service\Generator\Base\ContentProvider\BaseManagerContentProvider;
-use WonderWp\Plugin\Generator\Service\Generator\GeneratorInterface;
+use WonderWp\Plugin\Generator\Generator\Plugin\Base\ContentProvider\BaseActivatorContentProvider;
+use WonderWp\Plugin\Generator\Generator\Plugin\Base\ContentProvider\BaseAdminControllerContentProvider;
+use WonderWp\Plugin\Generator\Generator\Plugin\Base\ContentProvider\BaseHookServiceContentProvider;
+use WonderWp\Plugin\Generator\Generator\Plugin\Base\ContentProvider\BaseManagerContentProvider;
 use WP_Error;
 use WP_Filesystem_Direct;
 use function WonderWp\Functions\array_merge_recursive_distinct;
 
-class BaseGenerator implements GeneratorInterface
+class BaseGenerator extends AbstractGenerator
 {
-
-    //Attributes
-    /** @var string[] */
-    protected $data;
-    /** @var array */
-    protected $folders;
-
-    //Utils
-    /** @var Container */
-    protected $container;
-    /** @var GeneratorManager */
-    protected $manager;
-    /** @var  WP_Filesystem_Direct */
-    protected $fileSystem;
-    /** @var LoggerInterface */
-    protected $logger;
-
     //Content Providers
     /** @var BaseManagerContentProvider */
     protected $managerContentProvider;
@@ -49,38 +32,10 @@ class BaseGenerator implements GeneratorInterface
     /** @var BaseAdminControllerContentProvider */
     protected $adminControllerContentProvider;
 
-    /**
-     * @return string[]
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /** @inheritDoc */
-    public function setData(array $data)
-    {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    /** @inheritDoc */
-    public function setLogger($logger)
-    {
-        $this->logger = $logger;
-
-        return $this;
-    }
-
     /** Constructor */
     public function __construct(AbstractManager $manager)
     {
-        $this->container  = Container::getInstance();
-        $this->fileSystem = $this->container['wwp.fileSystem'];
-        $this->manager    = $manager;
-        $this->logger     = new VoidLogger();
-
+        parent::__construct($manager);
         $this->managerContentProvider         = new BaseManagerContentProvider();
         $this->activatorContentProvider       = new BaseActivatorContentProvider();
         $this->hookServiceContentProvider     = new BaseHookServiceContentProvider();
@@ -88,7 +43,7 @@ class BaseGenerator implements GeneratorInterface
     }
 
     /** @inheritDoc */
-    public function generate()
+    public function generate(): GenerationResult
     {
         $check = $this->checkDatas();
 
@@ -103,8 +58,7 @@ class BaseGenerator implements GeneratorInterface
                     ->generateActivator()
                     ->generateDeActivator()
                     ->generateHookService()
-                    ->generateAdminController()
-                ;
+                    ->generateAdminController();
             } catch (Exception $e) {
                 return new GenerationResult(500, ['msg' => $e->getMessage(), 'exception' => $e]);
             }
@@ -135,17 +89,6 @@ More information in the documentation : http://wonderwp.net/Creating_a_plugin/Ge
         $code = empty($errors) ? 200 : 403;
 
         return new DataCheckResult($code, ['datas' => $this->data, 'errors' => $errors]);
-    }
-
-    protected function prepareDatas()
-    {
-        if (empty($this->data['classprefix'])) {
-            $frags                     = explode('\\', $this->data['namespace']);
-            $this->data['classprefix'] = end($frags);
-        }
-        $this->data['className'] = $this->data['classprefix'];
-
-        return $this;
     }
 
     protected function createBaseFolders(array $folders = [])
@@ -315,35 +258,7 @@ EOD;
     }
 
     /**
-     * @param string $deliverable
-     * @param array  $replacements
-     *
-     * @return bool
-     */
-    protected function importDeliverable($deliverable, array $replacements = [])
-    {
-        $src = implode(DIRECTORY_SEPARATOR, [$this->manager->getConfig('path.root'), 'deliverables', $deliverable]);
-
-        if (!$this->fileSystem->exists($src) || !$this->fileSystem->is_readable($src)) {
-            throw new RuntimeException(sprintf('The deliverable file "%s" does not exist or is not readable', $src));
-        }
-
-        $content = $this->replacePlaceholders($this->fileSystem->get_contents($src), $replacements);
-        $dst     = implode(DIRECTORY_SEPARATOR, [$this->folders['base'], $this->replacePlaceholders($deliverable)]);
-
-        if (!$this->fileSystem->exists(dirname($dst))) {
-            $this->fileSystem->mkdir(dirname($dst));
-        }
-
-        if ($this->fileSystem->exists($dst)) {
-            $this->fileSystem->delete($dst);
-        }
-
-        return $this->fileSystem->put_contents($dst, $content, FS_CHMOD_FILE);
-    }
-
-    /**
-     * @param string   $string
+     * @param string $string
      * @param string[] $replacements
      *
      * @return string

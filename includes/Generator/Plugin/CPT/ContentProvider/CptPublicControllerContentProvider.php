@@ -1,6 +1,6 @@
 <?php
 
-namespace WonderWp\Plugin\Generator\Service\Generator\CPT\ContentProvider;
+namespace WonderWp\Plugin\Generator\Generator\Plugin\CPT\ContentProvider;
 
 class CptPublicControllerContentProvider
 {

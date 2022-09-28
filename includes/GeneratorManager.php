@@ -5,8 +5,10 @@ namespace WonderWp\Plugin\Generator;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\PluginSkeleton\AbstractPluginManager;
 use WonderWp\Component\Service\ServiceInterface;
-use WonderWp\Plugin\Generator\Service\Generator\Base\BaseGenerator;
-use WonderWp\Plugin\Generator\Service\Generator\CPT\CPTGenerator;
+use WonderWp\Plugin\Generator\Generator\Plugin\Base\BaseGenerator;
+use WonderWp\Plugin\Generator\Generator\Plugin\CPT\CPTGenerator;
+use WonderWp\Plugin\Generator\Generator\Theme\Block\BlockThemeGenerator;
+use WonderWp\Plugin\Generator\Generator\Theme\Classic\ClassicThemeGenerator;
 use WonderWp\Plugin\Generator\Service\GeneratorCommandService;
 
 class GeneratorManager extends AbstractPluginManager
@@ -30,6 +32,12 @@ class GeneratorManager extends AbstractPluginManager
         });
         $this->addService('CPTGenerator', function () {
             return new CPTGenerator($this);
+        });
+        $this->addService('classicThemeGenerator', function () {
+            return new ClassicThemeGenerator($this);
+        });
+        $this->addService('blockThemeGenerator', function () {
+            return new BlockThemeGenerator($this);
         });
 
         return $this;

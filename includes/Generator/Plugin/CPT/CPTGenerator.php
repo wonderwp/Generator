@@ -1,14 +1,14 @@
 <?php
 
-namespace WonderWp\Plugin\Generator\Service\Generator\CPT;
+namespace WonderWp\Plugin\Generator\Generator\Plugin\CPT;
 
 use Exception;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
 use WonderWp\Plugin\Generator\Result\GenerationResult;
-use WonderWp\Plugin\Generator\Service\Generator\Base\BaseGenerator;
-use WonderWp\Plugin\Generator\Service\Generator\CPT\ContentProvider\CptHookServiceContentProvider;
-use WonderWp\Plugin\Generator\Service\Generator\CPT\ContentProvider\CptManagerContentProvider;
-use WonderWp\Plugin\Generator\Service\Generator\CPT\ContentProvider\CptPublicControllerContentProvider;
+use WonderWp\Plugin\Generator\Generator\Plugin\Base\BaseGenerator;
+use WonderWp\Plugin\Generator\Generator\Plugin\CPT\ContentProvider\CptHookServiceContentProvider;
+use WonderWp\Plugin\Generator\Generator\Plugin\CPT\ContentProvider\CptManagerContentProvider;
+use WonderWp\Plugin\Generator\Generator\Plugin\CPT\ContentProvider\CptPublicControllerContentProvider;
 use function WonderWp\Functions\array_merge_recursive_distinct;
 
 class CPTGenerator extends BaseGenerator
@@ -29,7 +29,7 @@ class CPTGenerator extends BaseGenerator
     }
 
     /** @inheritDoc */
-    public function generate()
+    public function generate(): GenerationResult
     {
         try {
             $result = parent::generate();
