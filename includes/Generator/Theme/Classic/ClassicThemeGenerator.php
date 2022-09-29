@@ -3,7 +3,9 @@
 namespace WonderWp\Plugin\Generator\Generator\Theme\Classic;
 
 use Exception;
+use WonderWp\Component\PluginSkeleton\AbstractManager;
 use WonderWp\Plugin\Generator\Generator\Definition\AbstractGenerator;
+use WonderWp\Plugin\Generator\Generator\Theme\Classic\ContentProvider\ClassicManagerContentProvider;
 use WonderWp\Plugin\Generator\Result\DataCheckResult;
 use WonderWp\Plugin\Generator\Result\GenerationResult;
 use WP_Error;
@@ -12,6 +14,14 @@ use function WonderWp\Functions\array_merge_recursive_distinct;
 
 class ClassicThemeGenerator extends AbstractGenerator
 {
+    //Content Providers
+    /** @var ClassicManagerContentProvider */
+    protected $managerContentProvider;
+    public function __construct(AbstractManager $manager)
+    {
+        parent::__construct($manager);
+        $this->managerContentProvider     = new ClassicManagerContentProvider();
+    }
 
     public function generate(): GenerationResult
     {
@@ -27,6 +37,11 @@ class ClassicThemeGenerator extends AbstractGenerator
                     ->generateManager()
                     ->generateFunctionsFile()
                     ->generateHookService();
+                    ->generatePageFile()
+                    ->generatePageContentPartFile()
+                    ->generateHeaderFile()
+                    ->generateFooterFile()
+                    ->generateManager()
             } catch (Exception $e) {
                 return new GenerationResult(500, ['msg' => $e->getMessage(), 'exception' => $e]);
             }
@@ -62,14 +77,15 @@ More information in the documentation : http://wonderwp.net/Creating_a_theme/Get
 
     protected function createBaseFolders(array $folders = [])
     {
-        $this->folders              = $folders;
-        $this->folders['base']      = WP_CONTENT_DIR . '/themes/' . sanitize_title($this->data['name']);
-        $this->folders['includes']  = $this->folders['base'] . '/includes';
-        $this->folders['assets']    = $this->folders['base'] . '/assets';
-        $this->folders['templates'] = $this->folders['base'] . '/templates';
-        $this->folders['services']  = $this->folders['includes'] . '/Service';
-        $this->folders['languages'] = $this->folders['base'] . '/languages';
-        $errors                     = [];
+        $this->folders                   = $folders;
+        $this->folders['base']           = WP_CONTENT_DIR . '/themes/' . sanitize_title($this->data['name']);
+        $this->folders['assets']         = $this->folders['base'] . '/assets';
+        $this->folders['includes']       = $this->folders['base'] . '/includes';
+        $this->folders['services']       = $this->folders['includes'] . '/Service';
+        $this->folders['template-parts'] = $this->folders['base'] . '/template-parts';
+        $this->folders['page']           = $this->folders['template-parts'] . '/page';
+        $this->folders['languages']      = $this->folders['base'] . '/languages';
+        $errors                          = [];
 
         foreach ($this->folders as $folder) {
             if (!is_dir($folder)) {
@@ -133,20 +149,66 @@ More information in the documentation : http://wonderwp.net/Creating_a_theme/Get
         return $this;
     }
 
-    protected function generateFunctionsFile()
+    protected function generateFunctionsFile(array $givenReplacements = [])
     {
+        $baseReplacements = [];
+
+        $this->importDeliverable('functions.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements), 'theme');
+
         return $this;
     }
 
-    protected function generateManager($givenReplacements = [])
+    protected function generatePageFile(array $givenReplacements = [])
+    {
+        $baseReplacements = [];
+
+        $this->importDeliverable('page.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements), 'theme');
+
+        return $this;
+    }
+
+    protected function generatePageContentPartFile(array $givenReplacements = [])
     {
         $baseReplacements = [
-            //'//__MANAGER_EXTRA_USES//'            => $this->replacePlaceholders($this->managerContentProvider->getUsesContent()),
-            //'//__MANAGER_EXTRA_CONFIG__//'        => $this->replacePlaceholders($this->managerContentProvider->getConfigContent()),
-            //'//__MANAGER_EXTRA_CONTROLLERS__//'   => $this->replacePlaceholders($this->managerContentProvider->getControllersContent()),
-            //'//__MANAGER_EXTRA_SERVICES__//'      => $this->replacePlaceholders($this->managerContentProvider->getServicesContent()),
+            '__THEME_TEXTDOMAIN__' => !empty($this->data['textdomain']) ? $this->data['textdomain'] : strtolower($this->data['className'])
+        ];
+
+        $this->importDeliverable('template-parts' . DIRECTORY_SEPARATOR . 'page' . DIRECTORY_SEPARATOR . 'content-page.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements), 'theme');
+
+        return $this;
+    }
+
+    protected function generateHeaderFile(array $givenReplacements = [])
+    {
+        $baseReplacements = [
+            '__THEME_TEXTDOMAIN__' => !empty($this->data['textdomain']) ? $this->data['textdomain'] : strtolower($this->data['className'])
+        ];
+
+        $this->importDeliverable('header.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements), 'theme');
+
+        return $this;
+    }
+
+    protected function generateFooterFile(array $givenReplacements = [])
+    {
+        $baseReplacements = [
+            '__THEME_TEXTDOMAIN__' => !empty($this->data['textdomain']) ? $this->data['textdomain'] : strtolower($this->data['className'])
+        ];
+
+        $this->importDeliverable('footer.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements), 'theme');
+
+        return $this;
+    }
+
+    protected function generateManager(array $givenReplacements = [])
+    {
+        $baseReplacements = [
+            '//__MANAGER_EXTRA_USES//'           => $this->replacePlaceholders($this->managerContentProvider->getUsesContent()),
+            '//__MANAGER_EXTRA_CONFIG__//'       => $this->replacePlaceholders($this->managerContentProvider->getConfigContent()),
+            '//__MANAGER_EXTRA_SERVICES__//'     => $this->replacePlaceholders($this->managerContentProvider->getServicesContent()),
             '__THEME_PARENT_MANAGER_NAMESPACE__' => 'WonderWp\Component\PluginSkeleton\AbstractManager',
             '__THEME_PARENT_MANAGER__'           => 'AbstractManager',
+            '__THEME_TEXTDOMAIN__'               => !empty($this->data['textdomain']) ? $this->data['textdomain'] : strtolower($this->data['className'])
         ];
 
         $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . '__THEME_ENTITY__Manager.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements), 'theme');

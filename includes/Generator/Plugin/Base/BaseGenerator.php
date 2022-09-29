@@ -3,13 +3,8 @@
 namespace WonderWp\Plugin\Generator\Generator\Plugin\Base;
 
 use Exception;
-use RuntimeException;
-use WonderWp\Component\DependencyInjection\Container;
-use WonderWp\Component\Logging\LoggerInterface;
-use WonderWp\Component\Logging\VoidLogger;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
 use WonderWp\Plugin\Generator\Generator\Definition\AbstractGenerator;
-use WonderWp\Plugin\Generator\GeneratorManager;
 use WonderWp\Plugin\Generator\Result\DataCheckResult;
 use WonderWp\Plugin\Generator\Result\GenerationResult;
 use WonderWp\Plugin\Generator\Generator\Plugin\Base\ContentProvider\BaseActivatorContentProvider;
@@ -210,7 +205,7 @@ More information in the documentation : http://wonderwp.net/Creating_a_plugin/Ge
     /**
      * @return self
      */
-    protected function generateDeActivator($givenReplacements = [])
+    protected function generateDeActivator(array $givenReplacements = [])
     {
         // TODO
         return $this;
@@ -219,7 +214,7 @@ More information in the documentation : http://wonderwp.net/Creating_a_plugin/Ge
     /**
      * @return self
      */
-    protected function generateHookService($givenReplacements = [])
+    protected function generateHookService(array $givenReplacements = [])
     {
         $baseReplacements = [
             '//__PLUGIN_HOOKS_EXTRA_USES__//'         => $this->replacePlaceholders($this->hookServiceContentProvider->getUsesContent()),
@@ -235,7 +230,7 @@ More information in the documentation : http://wonderwp.net/Creating_a_plugin/Ge
     /**
      * @return self
      */
-    protected function generateAdminController($givenReplacements = [])
+    protected function generateAdminController(array $givenReplacements = [])
     {
         $baseReplacements = [
             '//__PLUGIN_DEFAULT_ACTION__//'          => $this->replacePlaceholders($this->adminControllerContentProvider->getDefaultActionContent()),
