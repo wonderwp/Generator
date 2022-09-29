@@ -5,6 +5,7 @@ namespace WonderWp\Plugin\Generator\Generator\Theme\Classic;
 use Exception;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
 use WonderWp\Plugin\Generator\Generator\Definition\AbstractGenerator;
+use WonderWp\Plugin\Generator\Generator\Theme\Classic\ContentProvider\ClassicHookServiceContentProvider;
 use WonderWp\Plugin\Generator\Generator\Theme\Classic\ContentProvider\ClassicManagerContentProvider;
 use WonderWp\Plugin\Generator\Result\DataCheckResult;
 use WonderWp\Plugin\Generator\Result\GenerationResult;
@@ -17,11 +18,16 @@ class ClassicThemeGenerator extends AbstractGenerator
     //Content Providers
     /** @var ClassicManagerContentProvider */
     protected $managerContentProvider;
+    /** @var ClassicHookServiceContentProvider */
+    protected $hookServiceContentProvider;
+
     public function __construct(AbstractManager $manager)
     {
         parent::__construct($manager);
         $this->managerContentProvider     = new ClassicManagerContentProvider();
+        $this->hookServiceContentProvider = new ClassicHookServiceContentProvider();
     }
+
 
     public function generate(): GenerationResult
     {
@@ -34,14 +40,13 @@ class ClassicThemeGenerator extends AbstractGenerator
                     ->createBaseFolders()
                     ->generateIndexFile()
                     ->generateCssFile()
-                    ->generateManager()
                     ->generateFunctionsFile()
-                    ->generateHookService();
                     ->generatePageFile()
                     ->generatePageContentPartFile()
                     ->generateHeaderFile()
                     ->generateFooterFile()
                     ->generateManager()
+                    ->generateHookService()
             } catch (Exception $e) {
                 return new GenerationResult(500, ['msg' => $e->getMessage(), 'exception' => $e]);
             }
@@ -216,8 +221,18 @@ More information in the documentation : http://wonderwp.net/Creating_a_theme/Get
         return $this;
     }
 
-    protected function generateHookService()
+    protected function generateHookService(array $givenReplacements = [])
     {
+        $baseReplacements = [
+            '//__THEME_HOOKS_EXTRA_USES__//'         => $this->replacePlaceholders($this->hookServiceContentProvider->getUsesContent()),
+            '//__THEME_HOOKS_EXTRA_DECLARATIONS__//' => $this->replacePlaceholders($this->hookServiceContentProvider->getHooksDeclarationsContent()),
+            '//__THEME_HOOKS_EXTRA_CALLABLES__//'    => $this->replacePlaceholders($this->hookServiceContentProvider->getHooksCallablesContent()),
+            '//__THEME_HOOKS_CLASS_ATTRIBUTES__//'   => $this->replacePlaceholders($this->hookServiceContentProvider->getHooksClassAttributes()),
+        ];
+        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR . '__THEME_ENTITY__HookService.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements), 'theme');
+
+        return $this;
+    }
         return $this;
     }
 

@@ -5,6 +5,7 @@ namespace __THEME_NS__;
 use WonderWp\Component\DependencyInjection\Container;
 use __THEME_PARENT_MANAGER_NAMESPACE__;
 use WonderWp\Component\Service\ServiceInterface;
+use __THEME_NS__\Service\__THEME_ENTITY__HookService;
 
 /**
  * The manager is the file that registers everything your plugin is going to use / need.
@@ -24,6 +25,7 @@ class __THEME_ENTITY__Manager extends __THEME_PARENT_MANAGER__
     public function register(Container $container)
     {
         define('WWP_THEME_TEXTDOMAIN', '__THEME_TEXTDOMAIN__');
+
         parent::register($container);
 
         // Register Config
@@ -31,6 +33,10 @@ class __THEME_ENTITY__Manager extends __THEME_PARENT_MANAGER__
         $this->setConfig('path.url', get_stylesheet_directory_uri());
         $this->setConfig('textDomain', WWP___THEME_CONST___TEXTDOMAIN);
         //__MANAGER_EXTRA_CONFIG__//
+        //Services
+        $this->addService(ServiceInterface::HOOK_SERVICE_NAME, function () {
+            return new __THEME_ENTITY__HookService($this);
+        });
         return $this;
     }
 }
