@@ -47,6 +47,9 @@ class ClassicThemeGenerator extends AbstractGenerator
                     ->generateFooterFile()
                     ->generateManager()
                     ->generateHookService()
+                    ->generateAssetManipulatorService()
+                    ->generateAssetService()
+                ;
             } catch (Exception $e) {
                 return new GenerationResult(500, ['msg' => $e->getMessage(), 'exception' => $e]);
             }
@@ -233,6 +236,22 @@ More information in the documentation : http://wonderwp.net/Creating_a_theme/Get
 
         return $this;
     }
+
+    protected function generateAssetManipulatorService(array $givenReplacements = [])
+    {
+        $baseReplacements = [];
+
+        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR . '__THEME_ENTITY__AssetManipulatorService.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements), 'theme');
+
+        return $this;
+    }
+
+    protected function generateAssetService(array $givenReplacements = [])
+    {
+        $baseReplacements = [];
+
+        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Service' . DIRECTORY_SEPARATOR . '__THEME_ENTITY__AssetService.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements), 'theme');
+
         return $this;
     }
 
