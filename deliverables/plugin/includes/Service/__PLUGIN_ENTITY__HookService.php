@@ -11,7 +11,7 @@ class __PLUGIN_ENTITY__HookService extends AbstractHookService
 {
     //__PLUGIN_HOOKS_CLASS_ATTRIBUTES__//
     /**
-     * Run
+     * Registering plugin hooks
      * @return $this
      */
     public function register()

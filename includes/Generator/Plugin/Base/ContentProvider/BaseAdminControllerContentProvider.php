@@ -1,6 +1,6 @@
 <?php
 
-namespace WonderWp\Plugin\Generator\Service\Generator\Base\ContentProvider;
+namespace WonderWp\Plugin\Generator\Generator\Plugin\Base\ContentProvider;
 
 class BaseAdminControllerContentProvider
 {

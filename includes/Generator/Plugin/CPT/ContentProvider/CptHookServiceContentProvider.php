@@ -1,8 +1,8 @@
 <?php
 
-namespace WonderWp\Plugin\Generator\Service\Generator\CPT\ContentProvider;
+namespace WonderWp\Plugin\Generator\Generator\Plugin\CPT\ContentProvider;
 
-use WonderWp\Plugin\Generator\Service\Generator\Base\ContentProvider\BaseHookServiceContentProvider;
+use WonderWp\Plugin\Generator\Generator\Plugin\Base\ContentProvider\BaseHookServiceContentProvider;
 
 class CptHookServiceContentProvider extends BaseHookServiceContentProvider
 {
