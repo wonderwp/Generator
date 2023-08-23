@@ -22,6 +22,7 @@ class BlockThemeGenerator extends ClassicThemeGenerator
                     ->generateIndexFile()
                     ->generateCssFile()
                     ->generateIndexhtmlFile()
+                    ->generateThemeJsonFile()
                     ->generateHeaderFile()
                     ->generateFooterFile()
                 ;
@@ -76,7 +77,13 @@ More information in the documentation : http://wonderwp.net/Creating_a_theme/Get
 
         return $this;
     }
-}    protected function generateHeaderFile(array $givenReplacements = [])
+
+    protected function generateThemeJsonFile()
+    {
+        $this->importDeliverable('theme.json', [], 'theme');
+
+        return $this;
+    }
 
     protected function generateHeaderFile(array $givenReplacements = [])
     {
