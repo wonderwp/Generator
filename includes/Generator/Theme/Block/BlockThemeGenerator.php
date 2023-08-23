@@ -77,6 +77,8 @@ More information in the documentation : http://wonderwp.net/Creating_a_theme/Get
         return $this;
     }
 }    protected function generateHeaderFile(array $givenReplacements = [])
+
+    protected function generateHeaderFile(array $givenReplacements = [])
     {
         $this->importDeliverable('parts' . DIRECTORY_SEPARATOR. 'header.html', [], 'theme');
 
@@ -89,3 +91,4 @@ More information in the documentation : http://wonderwp.net/Creating_a_theme/Get
 
         return $this;
     }
+}
