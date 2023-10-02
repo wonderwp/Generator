@@ -6,6 +6,7 @@ use Exception;
 use WonderWp\Plugin\Generator\Generator\Theme\Classic\ClassicThemeGenerator;
 use WonderWp\Plugin\Generator\Result\GenerationResult;
 use WP_Error;
+use function WonderWp\Functions\array_merge_recursive_distinct;
 
 class BlockThemeGenerator extends ClassicThemeGenerator
 {
@@ -21,6 +22,9 @@ class BlockThemeGenerator extends ClassicThemeGenerator
                     ->generateIndexFile()
                     ->generateCssFile()
                     ->generateIndexhtmlFile()
+                    ->generateThemeJsonFile()
+                    ->generateHeaderFile()
+                    ->generateFooterFile()
                 ;
             } catch (Exception $e) {
                 return new GenerationResult(500, ['msg' => $e->getMessage(), 'exception' => $e]);
@@ -44,13 +48,12 @@ More information in the documentation : http://wonderwp.net/Creating_a_theme/Get
     {
         $this->folders                   = $folders;
         $this->folders['base']           = WP_CONTENT_DIR . '/themes/' . sanitize_title($this->data['name']);
-        $this->folders['templates'] = $this->folders['base'] . '/templates';
         //$this->folders['assets']         = $this->folders['base'] . '/assets';
         //$this->folders['includes']       = $this->folders['base'] . '/includes';
         //$this->folders['services']       = $this->folders['includes'] . '/Service';
-        //$this->folders['template-parts'] = $this->folders['base'] . '/template-parts';
-        //$this->folders['page']           = $this->folders['template-parts'] . '/page';
-        //$this->folders['languages']      = $this->folders['base'] . '/languages';
+        $this->folders['parts']          = $this->folders['base'] . '/parts';
+        $this->folders['templates']      = $this->folders['base'] . '/templates';
+        $this->folders['languages']      = $this->folders['base'] . '/languages';
         $errors                          = [];
 
         foreach ($this->folders as $folder) {
@@ -71,6 +74,27 @@ More information in the documentation : http://wonderwp.net/Creating_a_theme/Get
     protected function generateIndexHtmlFile()
     {
         $this->importDeliverable('templates' . DIRECTORY_SEPARATOR. 'index.html', [], 'theme');
+
+        return $this;
+    }
+
+    protected function generateThemeJsonFile()
+    {
+        $this->importDeliverable('theme.json', [], 'theme');
+
+        return $this;
+    }
+
+    protected function generateHeaderFile(array $givenReplacements = [])
+    {
+        $this->importDeliverable('parts' . DIRECTORY_SEPARATOR. 'header.html', [], 'theme');
+
+        return $this;
+    }
+
+    protected function generateFooterFile(array $givenReplacements = [])
+    {
+        $this->importDeliverable('parts' . DIRECTORY_SEPARATOR. 'footer.html', [], 'theme');
 
         return $this;
     }
