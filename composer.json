@@ -19,7 +19,7 @@
     "wp-cli/wp-cli": "^2.5",
     "wonderwp/http-foundation": "dev-feature/increase_http_foundation_lib_version",
     "wonderwp/dependency-injection": "dev-feature/php_8",
-    "wonderwp/task": "^1.0"
+    "wonderwp/task": "dev-feature/php_8"
   },
   "autoload": {
     "psr-4": {"WonderWp\\Plugin\\Generator\\": "includes"},
