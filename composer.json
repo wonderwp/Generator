@@ -17,8 +17,8 @@
   "require": {
     "php": ">=8.0",
     "wp-cli/wp-cli": "^2.5",
-    "wonderwp/http-foundation": "^1.0",
-    "wonderwp/dependency-injection": "^1.0",
+    "wonderwp/http-foundation": "dev-feature/increase_http_foundation_lib_version",
+    "wonderwp/dependency-injection": "dev-feature/php_8",
     "wonderwp/task": "^1.0"
   },
   "autoload": {
