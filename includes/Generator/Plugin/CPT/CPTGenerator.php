@@ -48,7 +48,7 @@ class CPTGenerator extends BaseGenerator
     protected function generateCpt($givenReplacements = [])
     {
         $baseReplacements = [];
-        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'CPT' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__CPT.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements));
+        $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'PostTypes' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__PostType.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements));
 
         return $this;
     }
@@ -70,15 +70,6 @@ class CPTGenerator extends BaseGenerator
         $this->importDeliverable('includes' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR . '__PLUGIN_ENTITY__PublicController.php', array_merge_recursive_distinct($baseReplacements, $givenReplacements));
 
         return $this;
-    }
-
-    protected function createBaseFolders(array $folders = [])
-    {
-        $folders['base']   = WP_PLUGIN_DIR . '/' . sanitize_title($this->data['name']);
-        $folders['public'] = $folders['base'] . '/public';
-        $folders['views']  = $folders['public'] . '/views';
-
-        return parent::createBaseFolders($folders);
     }
 
     protected function generateRepository()
