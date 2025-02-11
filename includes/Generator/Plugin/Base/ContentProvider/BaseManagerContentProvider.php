@@ -29,10 +29,6 @@ class BaseManagerContentProvider
     public function getControllersContent()
     {
         return <<<'EOD'
-/* Uncomment this if your plugin has a public controller
-        $this->addController(AbstractManager::PUBLIC_CONTROLLER_TYPE, function () {
-            return $plugin_public = new __PLUGIN_ENTITY__PublicController($this);
-        }); */
 EOD;
     }
 

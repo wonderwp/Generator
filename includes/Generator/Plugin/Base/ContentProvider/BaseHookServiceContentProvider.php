@@ -2,6 +2,9 @@
 
 namespace WonderWp\Plugin\Generator\Generator\Plugin\Base\ContentProvider;
 
+/**
+ * @deprecated This has been removed for two reasons: Hooks are now auto loaded from the Hooks folder, and the customizeMenus method is too opinionated
+ */
 class BaseHookServiceContentProvider
 {
     /**

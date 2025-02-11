@@ -36,7 +36,6 @@ class CPTGenerator extends BaseGenerator
             $this
                 ->generateCPT()
                 ->generateRepository()
-                ->generatePublicController()
                 ->generateLanguages()
             ;
         } catch (Exception $e) {
@@ -54,6 +53,11 @@ class CPTGenerator extends BaseGenerator
         return $this;
     }
 
+    /**
+     * @deprecated Deemed too opinionated and too far from the WordPress native logic
+     * @param $givenReplacements
+     * @return $this
+     */
     protected function generatePublicController($givenReplacements = [])
     {
         $baseReplacements = [

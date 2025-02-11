@@ -4,6 +4,9 @@ namespace WonderWp\Plugin\Generator\Generator\Plugin\CPT\ContentProvider;
 
 use WonderWp\Plugin\Generator\Generator\Plugin\Base\ContentProvider\BaseHookServiceContentProvider;
 
+/**
+ * @deprecated This is not needed anymore are post types are now auto loaded
+ */
 class CptHookServiceContentProvider extends BaseHookServiceContentProvider
 {
 
