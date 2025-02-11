@@ -51,9 +51,7 @@ class BaseGenerator extends AbstractGenerator
                     ->generateBootstrapFile()
                     ->generateManager()
                     ->generateActivator()
-                    ->generateDeActivator()
-                    ->generateHookService()
-                    ->generateAdminController();
+                    ->generateDeActivator();
             } catch (Exception $e) {
                 return new GenerationResult(500, ['msg' => $e->getMessage(), 'exception' => $e]);
             }
@@ -92,7 +90,6 @@ More information in the documentation : http://wonderwp.net/Creating_a_plugin/Ge
         $this->folders['base']        = WP_PLUGIN_DIR . '/' . sanitize_title($this->data['name']);
         $this->folders['includes']    = $this->folders['base'] . '/includes';
         $this->folders['services']    = $this->folders['includes'] . '/Service';
-        $this->folders['controllers'] = $this->folders['includes'] . '/Controller';
         $this->folders['languages']   = $this->folders['base'] . '/languages';
         $errors                       = [];
 

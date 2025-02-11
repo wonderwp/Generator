@@ -11,7 +11,7 @@ use WonderWp\Plugin\Generator\GeneratorManager;
 
 class ThemeGeneratorCommand
 {
-    const COMMAND_NAME = 'generate-theme';
+    const COMMAND_NAME = 'wonderwp:generate-theme';
 
     protected static $managerReference = WWP_PLUGIN_GENERATOR_NAME . '.Manager';
     /** @var LoggerInterface */

@@ -11,7 +11,7 @@ use WonderWp\Plugin\Generator\Generator\GeneratorInterface;
 
 class PluginGeneratorCommand
 {
-    const COMMAND_NAME = 'generate-plugin';
+    const COMMAND_NAME = 'wonderwp:generate-plugin';
 
     protected static $managerReference = WWP_PLUGIN_GENERATOR_NAME . '.Manager';
     /** @var LoggerInterface */

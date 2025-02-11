@@ -3,12 +3,9 @@
 namespace __PLUGIN_NS__;
 
 use __PLUGIN_NS__\Service\__PLUGIN_ENTITY__Activator;
-use WonderWp\Component\PluginSkeleton\AbstractManager;
 use __PLUGIN_PARENT_MANAGER_NAMESPACE__;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Service\ServiceInterface;
-use __PLUGIN_NS__\Controller\__PLUGIN_ENTITY__AdminController;
-use __PLUGIN_NS__\Service\__PLUGIN_ENTITY__HookService;
 //__MANAGER_EXTRA_USES//
 
 /**
@@ -38,38 +35,10 @@ class __PLUGIN_ENTITY__Manager extends __PLUGIN_PARENT_MANAGER__
         //__MANAGER_EXTRA_CONFIG__//
 
         // Register Controllers
-        $this->addController(AbstractManager::ADMIN_CONTROLLER_TYPE, function () {
-            return new __PLUGIN_ENTITY__AdminController($this);
-        });
         //__MANAGER_EXTRA_CONTROLLERS__//
 
         // Register Services
-        $this->addService(ServiceInterface::HOOK_SERVICE_NAME, function () {
-            // Hook service
-            return new __PLUGIN_ENTITY__HookService($this);
-        });
         //__MANAGER_EXTRA_SERVICES__//
-
-        /* Uncomment this if your plugin has assets, then create the __PLUGIN_ENTITY__AssetService class in the include folder
-        $this->addService(ServiceInterface::ASSETS_SERVICE_NAME, function () {
-            // Asset service
-            return new __PLUGIN_ENTITY__AssetService();
-        });*/
-        /* Uncomment this if your plugin has particular routes, then create the __PLUGIN_ENTITY__RouteService class in the include folder
-        $this->addService(ServiceInterface::ROUTE_SERVICE_NAME, function () {
-            // Route service
-            return new __PLUGIN_ENTITY__RouteService();
-        }); */
-        /* Uncomment this if your plugin needs to register particular shortcodes, then create the __PLUGIN_ENTITY__ShortcodeService class in the include folder
-        $this->addService(ServiceInterface::SHORT_CODE_SERVICE_NAME, function () {
-            // Route service
-            return new __PLUGIN_ENTITY__ShortcodeService();
-        }); */
-        /* Uncomment this if your plugin has an api, then create the __PLUGIN_ENTITY__ApiService class in the include folder
-        $this->addService(ServiceInterface::API_SERVICE_NAME, function () {
-            //  Api service
-            return new __PLUGIN_ENTITY__ApiService();
-        }); */
 
         return $this;
     }
